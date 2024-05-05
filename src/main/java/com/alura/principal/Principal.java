@@ -6,6 +6,7 @@ import com.alura.services.ConsumoAPI;
 import com.alura.services.ConvierteDatosImp;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -13,6 +14,7 @@ public class Principal {
     private ConsumoAPI consumoApi = new ConsumoAPI();
     private ConvierteDatosImp conversor = new ConvierteDatosImp();
     private static final String URL_BASE = "https://gutendex.com/books/";
+    private static final String BUSQUEDA = "?search=";
 
     // methods
     public void mostrarMenu() {
@@ -28,5 +30,19 @@ public class Principal {
                 .limit(10)
                 .map(l -> l.titulo())
                 .forEach(System.out::println);
+
+        // Búsqueda de libro por nombre
+        System.out.println("Ingrese el nombre del libro que desea buscar: ");
+        String tituloLibro = teclado.nextLine().replace(" ", "+");
+        json = consumoApi.obtenerDatos(URL_BASE + BUSQUEDA + tituloLibro);
+        DatosGenerales datosBusqueda = conversor.obtenerDatos(json, DatosGenerales.class);
+        Optional<DatosLibro> libroBuscado = datosBusqueda.resultados().stream()
+                .filter(l -> l.titulo().toUpperCase().contains(tituloLibro.toUpperCase()))
+                .findFirst();
+        if (libroBuscado.isPresent()) {
+            System.out.println("El libro " + libroBuscado.get().titulo() + " fue encontrado.");
+        } else {
+            System.out.println("El libro " + tituloLibro + " no fue encontrado.");
+        }
     }
 }
