@@ -6,8 +6,10 @@ import com.alura.services.ConsumoAPI;
 import com.alura.services.ConvierteDatosImp;
 
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner teclado = new Scanner(System.in);
@@ -44,5 +46,14 @@ public class Principal {
         } else {
             System.out.println("El libro " + tituloLibro + " no fue encontrado.");
         }
+
+        // Trabajando con estadísticas
+        DoubleSummaryStatistics est = datos.resultados().stream()
+                .filter(d -> d.numeroDeDescargas() > 0)
+                .collect(Collectors.summarizingDouble(DatosLibro::numeroDeDescargas));
+        System.out.println("El promedio de descargas es: " + est.getAverage());
+        System.out.println("La cantidad máxima de descargas es: " + est.getMax());
+        System.out.println("La cantidad mínima de descargas es: " + est.getMin());
+        System.out.println("Cantidad de registros evaluados: " + est.getCount());
     }
 }
